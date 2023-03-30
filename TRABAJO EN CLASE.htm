@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Grupo de cubos</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+    import { OrbitControls } from 'https://unpkg.com/three@0.126.1/examples/jsm/controls/OrbitControls.js'; 
+    var WIDTH = window.innerWidth;
+    var HEIGHT = window.innerHeight;
+	
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(WIDTH, HEIGHT);
+    renderer.setClearColor(0x000000, 1);
+    document.body.appendChild(renderer.domElement);
+	
+	var size = 100;
+	var arrowSize = 40;
+	var divisions = 20;
+	var origin = new THREE.Vector3( 0, 0, 0 );
+	var x = new THREE.Vector3( 1, 0, 0 );
+	var y = new THREE.Vector3( 0, 1, 0 );
+	var z = new THREE.Vector3( 0, 0, 1 );
+	var color2 = new THREE.Color( 0x333333 );  /// 0x333333
+	var colorR = new THREE.Color( 0xAA0000 );
+	var colorG = new THREE.Color( 0x00AA00 );
+	var colorB = new THREE.Color( 0x0000AA );
+
+	//Create a guide (guilla)
+	var gridHelperXZ = new THREE.GridHelper( size, divisions, color2, color2);
+
+	//Create axes
+	var arrowX = new THREE.ArrowHelper( x, origin, arrowSize, colorR );
+	var arrowY = new THREE.ArrowHelper( y, origin, arrowSize, colorG );
+	var arrowZ = new THREE.ArrowHelper( z, origin, arrowSize, colorB );
+
+	var scene = new THREE.Scene();
+
+    var camera = new THREE.PerspectiveCamera(70, WIDTH / HEIGHT);
+    camera.position.z = 20;
+    camera.position.y = 5;
+    scene.add(camera);
+    const light = new THREE.AmbientLight(0x404040, 5);
+    scene.add(light);
+
+	//var controls = new OrbitControls(camera, renderer.domElement); //Controles 
+
+	// PARAMETROS PARA EL CUBO 
+	var lado = 8;
+	var base = lado;
+	var altura = lado;
+
+	const caracteristicas = [[lado, base, altura], [lado/2,  base/2, altura/2], [lado/4, base/4, altura/4]];	//pLICACION DE LOS PARAMETROS	
+	const color = [0xFFFFF00, 0x008f39, 0xCDCDCD]; //TEXTURAS DE LOS CUBOS
+	const material = [new THREE.MeshBasicMaterial({ color: color[0]}), new THREE.MeshNormalMaterial({ color: color[1]}), new THREE.MeshMatcapMaterial({ color: color[2]})];
+	
+	
+	// SE CREA UN "for" PARA LLAMAR LA GEOMETRIA DE LOS TRES CUBOS SOLICITADOS
+	const geometry = [];
+	for ( let m = 0; m < 3; m++) {
+
+		geometry.push(new THREE.BoxGeometry(...caracteristicas[m]));
+
+	}
+
+	//SE CREA UN  "for" PARA LA CRACION DE LOS TRES CUBOS
+	const c = [];
+	for ( let m = 0; m < 3; m++) {
+	
+		c.push(new THREE.Mesh(geometry[m], material[m]));
+
+	}
+
+	c[1].position.y = lado - lado/4;
+	c[2].position.y = lado + lado/8;
+	
+	for (let m = 0; m < 3; m++) {
+				
+				c[m].position.x = 0;
+			}
+		
+
+	for (let m = 0; m < 3; m++) {
+				
+		scene.add (c[m]);
+	}
+
+	scene.add(arrowX);
+	scene.add(arrowY);
+	scene.add(arrowZ);
+	scene.add(gridHelperXZ);
+
+	// CONTROLADORES DEL MOUSE
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    function animate() {
+
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera)
+    }
+    animate();
+  </script>
+</body>
+
+</html>
